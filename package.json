@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "lint": "eslint index.js index.test.js",
-    "package": "ncc build index.js -o dist",
+    "package": "ncc build index.js -o dist --minify --no-cache",
     "test": "eslint index.js index.test.js && jest"
   },
   "engines": {
@@ -32,8 +32,7 @@
     "@types/node": "^20.14.8",
     "@typescript-eslint/eslint-plugin": "^7.13.1",
     "@typescript-eslint/parser": "^7.13.1",
-    "@vercel/ncc": "^0.38.1",
-    "@zeit/ncc": "^0.22.3",
+    "@vercel/ncc": "^0.38.3",
     "eslint": "^8.57.0",
     "eslint-plugin-github": "^5.0.1",
     "eslint-plugin-jest": "^28.6.0",
