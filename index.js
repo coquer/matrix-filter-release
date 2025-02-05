@@ -99,7 +99,6 @@ async function run() {
     filteredMatrix = selectedItem.filter((key) => uniqueDirs.includes(key));
   }
 
-
   if (!filteredMatrix) {
     core.info('No services found in the list');
     core.setOutput('filtered', '[]');
