@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.3](https://github.com/coquer/matrix-filter-release/compare/v1.1.2...v1.1.3) (2025-02-05)
+
+
+### Miscellaneous
+
+* updates deps ([2ee262c](https://github.com/coquer/matrix-filter-release/commit/2ee262c06c10c64551a5a8a3ee3dfefc7655dbdc))
+
 ## [1.1.2](https://github.com/coquer/matrix-filter-release/compare/v1.1.1...v1.1.2) (2024-06-26)
 
 
