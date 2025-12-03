@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.4](https://github.com/coquer/matrix-filter-release/compare/v1.1.3...v1.1.4) (2025-12-03)
+
+
+### Miscellaneous
+
+* release all on missing tags ([7ef2cea](https://github.com/coquer/matrix-filter-release/commit/7ef2ceac764d9608fa7defd3d3d54952d55518ed))
+
 ## [1.1.3](https://github.com/coquer/matrix-filter-release/compare/v1.1.2...v1.1.3) (2025-02-05)
 
 
