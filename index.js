@@ -63,49 +63,54 @@ async function run() {
   const owner = repository[0];
   const repo = repository[1];
 
-  const response = await octokit.repos.compareCommitsWithBasehead({
-    owner,
-    repo,
-    basehead: await getBaseHead(octokit, owner, repo, inputs.ref)
-  });
+  try {
+    const response = await octokit.repos.compareCommitsWithBasehead({
+      owner,
+      repo,
+      basehead: await getBaseHead(octokit, owner, repo, inputs.ref)
+    });
 
-  const files = response.data.files;
+    const files = response.data.files;
 
-  if (!files) {
-    core.info('No files changed in the commit');
-    core.setOutput('filtered', '[]');
-    return;
-  }
-
-  const resultFileChanges = files.map((file) => file.filename);
-  const filtered = resultFileChanges.filter((item, index) => resultFileChanges.indexOf(item) === index).map((file) => file.substr(0, file.indexOf('/')))
-      .filter((item, index) => item.indexOf('/') === -1 && item.length > 0);
-  const uniqueDirs = filtered.filter((item, index) => filtered.indexOf(item) === index);
-
-  const filterBy = inputs.filter_by;
-  const isSlice = inputs.is_slice === 'true';
-
-  let filteredMatrix = null;
-
-  if (false === isSlice) {
-    filteredMatrix = list.filter(({service}) => uniqueDirs.includes(service));
-  } else {
-    let selectedItem = list[filterBy];
-
-    if (typeof selectedItem === 'object' && selectedItem[Object.keys(selectedItem)[0]] instanceof Object) {
-        selectedItem = Object.keys(selectedItem);
+    if (!files) {
+      core.info('No files changed in the commit');
+      core.setOutput('filtered', '[]');
+      return;
     }
 
-    filteredMatrix = selectedItem.filter((key) => uniqueDirs.includes(key));
-  }
+    const resultFileChanges = files.map((file) => file.filename);
+    const filtered = resultFileChanges.filter((item, index) => resultFileChanges.indexOf(item) === index).map((file) => file.substr(0, file.indexOf('/')))
+        .filter((item, index) => item.indexOf('/') === -1 && item.length > 0);
+    const uniqueDirs = filtered.filter((item, index) => filtered.indexOf(item) === index);
 
-  if (!filteredMatrix) {
-    core.info('No services found in the list');
-    core.setOutput('filtered', '[]');
-    return;
-  }
+    const filterBy = inputs.filter_by;
+    const isSlice = inputs.is_slice === 'true';
 
-  core.setOutput('filtered', JSON.stringify(filteredMatrix));
+    let filteredMatrix = null;
+
+    if (false === isSlice) {
+      filteredMatrix = list.filter(({service}) => uniqueDirs.includes(service));
+    } else {
+      let selectedItem = list[filterBy];
+
+      if (typeof selectedItem === 'object' && selectedItem[Object.keys(selectedItem)[0]] instanceof Object) {
+        selectedItem = Object.keys(selectedItem);
+      }
+
+      filteredMatrix = selectedItem.filter((key) => uniqueDirs.includes(key));
+    }
+
+    if (!filteredMatrix) {
+      core.info('No services found in the list');
+      core.setOutput('filtered', '[]');
+      return;
+    }
+
+    core.setOutput('filtered', JSON.stringify(filteredMatrix));
+  } catch (error) {
+    core.info("There is not tag in the repository, returning full list");
+    core.setOutput('filtered', JSON.stringify(list));
+  }
 }
 
 async function getBaseHead(octokit, owner, repo, ref) {
@@ -119,9 +124,7 @@ async function getBaseHead(octokit, owner, repo, ref) {
 
   if (reference === defaultBranch) {
     if (lastTag === '') {
-      const firstCommit = await getFirstCommit(octokit, owner, repo);
-      core.info('diff: ' + `${firstCommit}...${defaultBranch}`);
-      return `${firstCommit}...${defaultBranch}`;
+      throw new Error('No tags found in the repository');
     }
 
     core.info('diff: ' + `${lastTag}...${defaultBranch}`);
@@ -174,22 +177,6 @@ async function getLastTag(octokit, owner, repo) {
   }
 
   return data[0].name;
-}
-
-async function getFirstCommit(octokit, owner, repo) {
-  const {data} = await octokit.repos.listCommits({
-    owner,
-    repo
-  });
-
-  if (data.length === 0) {
-    return '';
-  }
-
-  // Sort the commits by date in ascending order
-  data.sort((a, b) => new Date(a.commit.author.date) - new Date(b.commit.author.date));
-
-  return data[0].sha;
 }
 
 run().catch((error) => {
