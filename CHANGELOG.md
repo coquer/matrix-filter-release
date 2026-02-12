@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.1.5](https://github.com/coquer/matrix-filter-release/compare/v1.1.4...v1.1.5) (2026-02-12)
+
+
+### Miscellaneous
+
+* **deps:** bump actions/checkout from 4 to 6 ([882543e](https://github.com/coquer/matrix-filter-release/commit/882543ea2afde47dc00b67b97482e740c623fc45))
+* **deps:** bump actions/setup-node from 4 to 6 ([14aee46](https://github.com/coquer/matrix-filter-release/commit/14aee46b3f71006f779f3d8de0ddd7ac6bdd8ec1))
+* updates ([ff325b1](https://github.com/coquer/matrix-filter-release/commit/ff325b13b8d01765ca6a80138acb01dc552912b9))
+
 ## [1.1.4](https://github.com/coquer/matrix-filter-release/compare/v1.1.3...v1.1.4) (2025-12-03)
 
 
