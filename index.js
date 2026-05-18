@@ -1,7 +1,7 @@
-const core = require('@actions/core');
-const fs = require('node:fs');
-const {Octokit} = require('@octokit/rest');
-const {HttpsProxyAgent} = require('https-proxy-agent');
+import * as core from '@actions/core';
+import fs from 'node:fs';
+import { Octokit } from '@octokit/rest'
+import { HttpsProxyAgent } from 'https-proxy-agent';
 
 const GH_API_URL = 'https://api.github.com';
 
