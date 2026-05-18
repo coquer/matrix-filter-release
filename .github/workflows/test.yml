@@ -11,12 +11,13 @@ on:
 jobs:
   test-github-actions:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: Setup node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v4
         with:
           node-version: 24
 
@@ -30,9 +31,8 @@ jobs:
         id: verify
         uses: ./
         with:
-          token: ${{ secrets.SECRET_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           list: './matrix.json'
 
-      - name: get outputs from
-        run: echo "The filtered list is ${{ steps.verify.outputs.filtered }}"
-
+      - name: Print output
+        run: echo "Filtered list ${{ steps.verify.outputs.filtered }}"

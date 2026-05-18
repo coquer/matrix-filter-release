@@ -45,15 +45,14 @@ async function run() {
     return;
   }
 
+  const proxyUrl = process.env.HTTPS_PROXY || process.env.https_proxy;
   const octokit = new Octokit({
     auth: inputs.token,
     baseUrl: GH_API_URL,
-    request: {
-      agent: new HttpsProxyAgent(GH_API_URL),
-    }
+    ...(proxyUrl ? { request: { agent: new HttpsProxyAgent(proxyUrl) } } : {})
   });
 
-  const repository = process.env.GITHUB_REPOSITORY.split('/');
+  const repository = inputs.repository.split('/');
 
   if (repository.length !== 2) {
     core.setFailed('Invalid repository');
@@ -79,8 +78,11 @@ async function run() {
     }
 
     const resultFileChanges = files.map((file) => file.filename);
-    const filtered = resultFileChanges.filter((item, index) => resultFileChanges.indexOf(item) === index).map((file) => file.substr(0, file.indexOf('/')))
-        .filter((item, index) => item.indexOf('/') === -1 && item.length > 0);
+    const filtered = resultFileChanges
+        .filter((item, index) => resultFileChanges.indexOf(item) === index)
+        .filter((file) => file.includes('/'))
+        .map((file) => file.substr(0, file.indexOf('/')))
+        .filter((item) => item.length > 0);
     const uniqueDirs = filtered.filter((item, index) => filtered.indexOf(item) === index);
 
     const filterBy = inputs.filter_by;
@@ -93,23 +95,30 @@ async function run() {
     } else {
       let selectedItem = list[filterBy];
 
-      if (typeof selectedItem === 'object' && selectedItem[Object.keys(selectedItem)[0]] instanceof Object) {
+      if (selectedItem === undefined || selectedItem === null) {
+        core.setFailed(`filter_by key '${filterBy}' not found in list`);
+        return;
+      }
+
+      if (typeof selectedItem === 'object' && !Array.isArray(selectedItem) && selectedItem[Object.keys(selectedItem)[0]] instanceof Object) {
         selectedItem = Object.keys(selectedItem);
+      }
+
+      if (!Array.isArray(selectedItem)) {
+        selectedItem = [selectedItem];
       }
 
       filteredMatrix = selectedItem.filter((key) => uniqueDirs.includes(key));
     }
 
-    if (!filteredMatrix) {
-      core.info('No services found in the list');
-      core.setOutput('filtered', '[]');
-      return;
-    }
-
     core.setOutput('filtered', JSON.stringify(filteredMatrix));
   } catch (error) {
-    core.info("There is not tag in the repository, returning full list");
-    core.setOutput('filtered', JSON.stringify(list));
+    if (error.message && error.message.includes('No tags found')) {
+      core.info('No tags found in the repository, returning full list');
+      core.setOutput('filtered', JSON.stringify(list));
+    } else {
+      core.setFailed(`Action failed: ${error.message}`);
+    }
   }
 }
 
@@ -182,4 +191,3 @@ async function getLastTag(octokit, owner, repo) {
 run().catch((error) => {
   core.setFailed(error.message);
 });
-

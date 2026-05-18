@@ -8,12 +8,17 @@ on:
 jobs:
   release-management:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      pull-requests: write
     outputs:
         release-to-prod: ${{ steps.release.outputs.release_created }}
         tag: ${{ steps.release.outputs.tag_name }}
         sha: ${{ steps.release.outputs.sha }}
     steps:
       - name: Manage release
+        id: release
         uses: googleapis/release-please-action@v5
         with:
           token: ${{ secrets.SECRET_TOKEN }}
